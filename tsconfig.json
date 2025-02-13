@@ -5,6 +5,19 @@
     "jsx": "react-jsx",
     "module": "esnext",
     "target": "esnext",
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node",
+    "strict": false,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "dist",
+    "backend",
+    "node_modules",
+    "vite.config.js",
+    "tailwind.config.js",
+    "postcss.config.js"
+  ]
 }
