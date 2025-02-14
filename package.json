@@ -11,8 +11,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
- "dependencies": {
+"dependencies": {
   "express": "^4.21.2",
+  "puppeteer": "^22.0.0",
   "@supabase/supabase-js": "^2.39.0",
   "autoprefixer": "^10.4.16",
   "axios": "^1.6.2",
@@ -25,7 +26,8 @@
   "react-dom": "^18.2.0",
   "react-hot-toast": "^2.4.1",
   "tailwindcss": "^3.3.5"
-},
+}
+,
   "devDependencies": {
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
