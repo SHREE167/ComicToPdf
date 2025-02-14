@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import * as React from "react";  // Fix default import issue
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Download, BookOpen, Loader, CheckCircle, AlertTriangle, List } from "lucide-react";
 
