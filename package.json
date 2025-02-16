@@ -13,7 +13,8 @@
   },
 "dependencies": {
   "express": "^4.21.2",
-  "puppeteer": "^22.0.0",
+  "@sparticuz/chromium": "^116",
+  "puppeteer-core": "^21.0.0",
   "sharp": "^0.32.6",
   "pdfkit": "^0.13.0",
   "cors": "^2.8.5",

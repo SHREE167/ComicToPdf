@@ -1,5 +1,4 @@
-import * as React from "react";  // Fix default import issue
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Download, BookOpen, Loader, CheckCircle, AlertTriangle, List } from "lucide-react";
 
@@ -12,61 +11,71 @@ function App() {
   const [status, setStatus] = useState({ type: "", message: "" });
   const [siteType, setSiteType] = useState(null);
 
-  // Fetch chapters based on URL
-  const fetchChapters = async () => {
-    setStatus({ type: "", message: "" });
+  const backendUrl = "https://comictopdf-production.up.railway.app"; // ✅ Base URL
 
-    try {
-      setLoading(true);
-      const response = await fetch("http://localhost:5000/get-chapters", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mangaUrl }),
-      });
+// Fetch chapters based on URL
+const fetchChapters = async () => {
+  setStatus({ type: "", message: "" });
 
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
+  try {
+    setLoading(true);
+    const response = await fetch(`${backendUrl}/get-chapters`, {  // ✅ Correct endpoint
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mangaUrl }),
+    });
 
-      setChapters(data.chapters);
-      setSelectedStart(data.chapters[0]?.title || "");
-      setSelectedEnd(data.chapters[data.chapters.length - 1]?.title || "");
-      setSiteType(data.siteType);
-      setStatus({ type: "success", message: "Chapters loaded successfully!" });
-    } catch (err) {
-      setStatus({ type: "error", message: err.message || "Failed to fetch chapters" });
-    } finally {
-      setLoading(false);
-    }
-  };
+    if (!response.ok) throw new Error("Failed to fetch chapters");
 
-  // Handle PDF download
-  const handleDownload = async (e) => {
-    e.preventDefault();
-    setStatus({ type: "", message: "" });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
 
-    try {
-      setLoading(true);
-      const response = await fetch("http://localhost:5000/scrape-comic", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mangaUrl, startChapter: selectedStart, endChapter: selectedEnd }),
-      });
+    setChapters(data.chapters);
+    setSelectedStart(data.chapters[0]?.title || "");
+    setSelectedEnd(data.chapters[data.chapters.length - 1]?.title || "");
+    setSiteType(data.siteType);
+    setStatus({ type: "success", message: "Chapters loaded successfully!" });
+  } catch (err) {
+    setStatus({ type: "error", message: err.message || "Failed to fetch chapters" });
+  } finally {
+    setLoading(false);
+  }
+};
 
-      if (!response.ok) throw new Error("Failed to fetch PDF");
-      const blob = await response.blob();
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = "comic.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setStatus({ type: "success", message: "PDF downloaded successfully!" });
-    } catch (err) {
-      setStatus({ type: "error", message: "Failed to process the comic. Please try again." });
-    } finally {
-      setLoading(false);
-    }
-  };
+// Handle PDF download
+const handleDownload = async (e) => {
+  e.preventDefault();
+  setStatus({ type: "", message: "" });
+
+  try {
+    setLoading(true);
+    const response = await fetch(`${backendUrl}/scrape-comic`, {  // ✅ Correct endpoint
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        mangaUrl, 
+        startChapter: selectedStart, 
+        endChapter: selectedEnd 
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch PDF");
+
+    const blob = await response.blob();
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = "comic.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setStatus({ type: "success", message: "PDF downloaded successfully!" });
+  } catch (err) {
+    setStatus({ type: "error", message: "Failed to process the comic. Please try again." });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-6 space-y-6">
@@ -95,7 +104,7 @@ function App() {
               type="url"
               value={mangaUrl}
               onChange={(e) => setMangaUrl(e.target.value)}
-              placeholder="Enterthe novel interface URL Example: https://kingofshojo.com/manga/solo-leveling/"
+              placeholder="Enter the novel interface URL Example: https://kingofshojo.com/manga/solo-leveling/"
               className="block w-full px-4 py-3 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-400"
               required
             />

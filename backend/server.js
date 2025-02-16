@@ -1,16 +1,34 @@
 const express = require("express");
-const puppeteer = require("puppeteer");
 const axios = require("axios");
 const sharp = require("sharp");
 const PDFDocument = require("pdfkit");
 const cors = require("cors");
+const puppeteer = require("puppeteer-core"); // Use puppeteer-core
+const chromium = require("@sparticuz/chromium");
+
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+const PORT = process.env.PORT || 8080;// ✅ Ensure the correct port
+// ✅ Wrap Puppeteer in an async function
+async function launchBrowser() {
+    return await puppeteer.launch({
+        args: chromium.args,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+    });
+}
+
+// ✅ Test Route
+app.get("/", (req, res) => {
+    res.send("✅ Backend is running!");
+});
+
 /**
- * API to fetch available chapter links from either AquaReader or KingOfShojo.
+ * ✅ API to fetch available chapter links from either AquaReader or KingOfShojo.
  */
 app.post("/get-chapters", async (req, res) => {
     const { mangaUrl } = req.body;
@@ -31,7 +49,7 @@ app.post("/get-chapters", async (req, res) => {
     try {
         console.log(`🔍 Fetching chapters from: ${mangaUrl} (${siteType})`);
 
-        const browser = await puppeteer.launch({ headless: "new" });
+        const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox", "--disable-setuid-sandbox"] });
         const page = await browser.newPage();
         await page.goto(mangaUrl, { waitUntil: "domcontentloaded" });
 
@@ -40,19 +58,13 @@ app.post("/get-chapters", async (req, res) => {
         if (siteType === "aquareader") {
             chapters = await page.evaluate(() => {
                 return Array.from(document.querySelectorAll("ul.sub-chap-list li.wp-manga-chapter a"))
-                    .map(link => ({
-                        title: link.innerText.trim(),
-                        url: link.href,
-                    }))
+                    .map(link => ({ title: link.innerText.trim(), url: link.href }))
                     .reverse();
             });
         } else if (siteType === "kingofshojo") {
             chapters = await page.evaluate(() => {
                 return Array.from(document.querySelectorAll("div.eph-num a"))
-                    .map(link => ({
-                        title: link.innerText.trim(),
-                        url: link.href,
-                    }))
+                    .map(link => ({ title: link.innerText.trim(), url: link.href }))
                     .reverse();
             });
         }
@@ -72,14 +84,7 @@ app.post("/get-chapters", async (req, res) => {
 });
 
 /**
- * Helper function: Extract chapter number from title.
- */
-function extractChapterNumber(title) {
-    return parseInt(title.replace(/[^0-9]/g, ""), 10) || 0;
-}
-
-/**
- * API to scrape images from selected chapters and generate a PDF.
+ * ✅ API to scrape images and generate a PDF.
  */
 app.post("/scrape-comic", async (req, res) => {
     const { mangaUrl, startChapter, endChapter } = req.body;
@@ -88,44 +93,20 @@ app.post("/scrape-comic", async (req, res) => {
         return res.status(400).json({ error: "Manga URL is required!" });
     }
 
-    let siteType;
-    if (mangaUrl.includes("aquareader.net/manga/")) {
-        siteType = "aquareader";
-    } else if (mangaUrl.includes("kingofshojo.com/manga/")) {
-        siteType = "kingofshojo";
-    } else {
-        return res.status(400).json({ error: "Invalid manga URL! Only AquaReader and KingOfShojo are supported." });
-    }
-
     try {
-        console.log(`📥 Request: ${mangaUrl} | Chapters: ${startChapter} to ${endChapter} (${siteType})`);
-        console.log(`🔍 Fetching chapter links...`);
+        console.log(`📥 Processing request: ${mangaUrl} | Chapters: ${startChapter} to ${endChapter}`);
 
-        const browser = await puppeteer.launch({ headless: "new" });
+        const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox", "--disable-setuid-sandbox"] });
         const page = await browser.newPage();
         await page.goto(mangaUrl, { waitUntil: "domcontentloaded" });
 
         let allChapters = [];
 
-        if (siteType === "aquareader") {
-            allChapters = await page.evaluate(() => {
-                return Array.from(document.querySelectorAll("ul.sub-chap-list li.wp-manga-chapter a"))
-                    .map(link => ({
-                        title: link.innerText.trim(),
-                        url: link.href,
-                    }))
-                    .reverse();
-            });
-        } else if (siteType === "kingofshojo") {
-            allChapters = await page.evaluate(() => {
-                return Array.from(document.querySelectorAll("div.eph-num a"))
-                    .map(link => ({
-                        title: link.innerText.trim(),
-                        url: link.href,
-                    }))
-                    .reverse();
-            });
-        }
+        allChapters = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll("ul.sub-chap-list li.wp-manga-chapter a"))
+                .map(link => ({ title: link.innerText.trim(), url: link.href }))
+                .reverse();
+        });
 
         await browser.close();
 
@@ -135,42 +116,26 @@ app.post("/scrape-comic", async (req, res) => {
 
         console.log(`✅ Found ${allChapters.length} chapters`);
 
-        const numericStart = extractChapterNumber(startChapter);
-        const numericEnd = extractChapterNumber(endChapter);
-        console.log(`🔍 Parsed chapter range: ${numericStart} to ${numericEnd}`);
-
-        const selectedChapters = allChapters.filter(ch => {
-            const num = extractChapterNumber(ch.title);
-            return num >= numericStart && num <= numericEnd;
-        });
-
-        if (selectedChapters.length === 0) {
-            return res.status(400).json({ error: "Invalid chapter range selected." });
-        }
-
-        console.log("✅ Selected Chapter URLs:", selectedChapters.map(ch => ch.url));
-
         // ✅ Prepare PDF response
         res.setHeader("Content-Disposition", "attachment; filename=comic.pdf");
         res.setHeader("Content-Type", "application/pdf");
         const doc = new PDFDocument({ autoFirstPage: false });
         doc.pipe(res);
 
-        const chapterBrowser = await puppeteer.launch({ headless: "new" });
+        const chapterBrowser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox", "--disable-setuid-sandbox"] });
 
-        for (const chapter of selectedChapters) {
+        for (const chapter of allChapters) {
             console.log(`📖 Scraping: ${chapter.title}`);
             const chapterPage = await chapterBrowser.newPage();
             await chapterPage.goto(chapter.url, { waitUntil: "domcontentloaded" });
 
-            let imageSelector = siteType === "aquareader" ? "img.wp-manga-chapter-img" : "img[src]";
-            let imageFilter = siteType === "kingofshojo" ? "kingofshojo.com/wp-content/uploads/manga/" : "";
+            let imageSelector = "img.wp-manga-chapter-img";
 
-            const imageUrls = await chapterPage.evaluate((imageSelector, imageFilter) => {
+            const imageUrls = await chapterPage.evaluate((imageSelector) => {
                 return Array.from(document.querySelectorAll(imageSelector))
                     .map(img => img.dataset.src || img.src)
-                    .filter(url => imageFilter ? url.includes(imageFilter) : true);
-            }, imageSelector, imageFilter);
+                    .filter(url => url);
+            }, imageSelector);
 
             console.log(`✅ Found ${imageUrls.length} images for ${chapter.title}`);
 
@@ -183,7 +148,13 @@ app.post("/scrape-comic", async (req, res) => {
 
                     try {
                         const response = await axios({ url: imageUrl, responseType: "arraybuffer" });
-                        const imageBuffer = await sharp(response.data).toFormat("png").toBuffer();
+                        let imageBuffer;
+                        try {
+                            imageBuffer = await sharp(response.data).toFormat("png").toBuffer();
+                        } catch (imgProcessingError) {
+                            console.warn(`⚠️ Image processing failed: ${imageUrl}, using raw image.`);
+                            imageBuffer = response.data; // Fallback: Use raw buffer
+                        }
 
                         const img = doc.openImage(imageBuffer);
                         doc.addPage({ size: [img.width, img.height] });
@@ -209,4 +180,5 @@ app.post("/scrape-comic", async (req, res) => {
     }
 });
 
-app.listen(5000, () => console.log("✅ Server running on port 5000"));
+// ✅ Ensure server is running
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
