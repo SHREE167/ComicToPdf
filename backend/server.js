@@ -6,18 +6,17 @@ const cors = require("cors");
 const puppeteer = require("puppeteer-core"); // Use puppeteer-core
 const chromium = require("@sparticuz/chromium");
 
-
-
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 8080;// ✅ Ensure the correct port
-// ✅ Wrap Puppeteer in an async function
+const PORT = process.env.PORT || 8080;
+
+// ✅ Function to launch Puppeteer with proper settings
 async function launchBrowser() {
     return await puppeteer.launch({
         args: chromium.args,
-        executablePath: await chromium.executablePath(),
+        executablePath: await chromium.executablePath() || "/usr/bin/google-chrome", // Ensure executable path is set
         headless: chromium.headless,
     });
 }
@@ -49,7 +48,7 @@ app.post("/get-chapters", async (req, res) => {
     try {
         console.log(`🔍 Fetching chapters from: ${mangaUrl} (${siteType})`);
 
-        const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+        const browser = await launchBrowser(); // ✅ Using the fixed launch function
         const page = await browser.newPage();
         await page.goto(mangaUrl, { waitUntil: "domcontentloaded" });
 
@@ -96,7 +95,7 @@ app.post("/scrape-comic", async (req, res) => {
     try {
         console.log(`📥 Processing request: ${mangaUrl} | Chapters: ${startChapter} to ${endChapter}`);
 
-        const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+        const browser = await launchBrowser(); // ✅ Using the fixed launch function
         const page = await browser.newPage();
         await page.goto(mangaUrl, { waitUntil: "domcontentloaded" });
 
@@ -122,7 +121,7 @@ app.post("/scrape-comic", async (req, res) => {
         const doc = new PDFDocument({ autoFirstPage: false });
         doc.pipe(res);
 
-        const chapterBrowser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+        const chapterBrowser = await launchBrowser(); // ✅ Using the fixed launch function
 
         for (const chapter of allChapters) {
             console.log(`📖 Scraping: ${chapter.title}`);
