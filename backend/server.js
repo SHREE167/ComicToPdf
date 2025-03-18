@@ -7,16 +7,22 @@ const puppeteer = require("puppeteer-core"); // Use puppeteer-core
 const chromium = require("@sparticuz/chromium");
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+
+// ✅ Proper CORS Configuration
+app.use(cors({
+    origin: "*", // Change this to your frontend URL if needed
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 const PORT = process.env.PORT || 8080;
 
-// ✅ Function to launch Puppeteer with proper settings
+// ✅ Function to Launch Puppeteer with Chromium
 async function launchBrowser() {
     return await puppeteer.launch({
         args: chromium.args,
-        executablePath: await chromium.executablePath() || "/usr/bin/google-chrome", // Ensure executable path is set
+        executablePath: await chromium.executablePath() || "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", // ✅ Use Chromium or Edge
         headless: chromium.headless,
     });
 }
@@ -26,9 +32,7 @@ app.get("/", (req, res) => {
     res.send("✅ Backend is running!");
 });
 
-/**
- * ✅ API to fetch available chapter links from either AquaReader or KingOfShojo.
- */
+// ✅ API to fetch available chapter links
 app.post("/get-chapters", async (req, res) => {
     const { mangaUrl } = req.body;
 
@@ -48,7 +52,7 @@ app.post("/get-chapters", async (req, res) => {
     try {
         console.log(`🔍 Fetching chapters from: ${mangaUrl} (${siteType})`);
 
-        const browser = await launchBrowser(); // ✅ Using the fixed launch function
+        const browser = await launchBrowser();
         const page = await browser.newPage();
         await page.goto(mangaUrl, { waitUntil: "domcontentloaded" });
 
@@ -82,9 +86,7 @@ app.post("/get-chapters", async (req, res) => {
     }
 });
 
-/**
- * ✅ API to scrape images and generate a PDF.
- */
+// ✅ API to scrape images and generate a PDF
 app.post("/scrape-comic", async (req, res) => {
     const { mangaUrl, startChapter, endChapter } = req.body;
 
@@ -95,13 +97,11 @@ app.post("/scrape-comic", async (req, res) => {
     try {
         console.log(`📥 Processing request: ${mangaUrl} | Chapters: ${startChapter} to ${endChapter}`);
 
-        const browser = await launchBrowser(); // ✅ Using the fixed launch function
+        const browser = await launchBrowser();
         const page = await browser.newPage();
         await page.goto(mangaUrl, { waitUntil: "domcontentloaded" });
 
-        let allChapters = [];
-
-        allChapters = await page.evaluate(() => {
+        let allChapters = await page.evaluate(() => {
             return Array.from(document.querySelectorAll("ul.sub-chap-list li.wp-manga-chapter a"))
                 .map(link => ({ title: link.innerText.trim(), url: link.href }))
                 .reverse();
@@ -121,7 +121,7 @@ app.post("/scrape-comic", async (req, res) => {
         const doc = new PDFDocument({ autoFirstPage: false });
         doc.pipe(res);
 
-        const chapterBrowser = await launchBrowser(); // ✅ Using the fixed launch function
+        const chapterBrowser = await launchBrowser();
 
         for (const chapter of allChapters) {
             console.log(`📖 Scraping: ${chapter.title}`);
