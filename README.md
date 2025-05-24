@@ -35,7 +35,8 @@ Comic To Pdf effectively allows you to turn your favorite comics into pdfs for o
 - Click your fav Comic just by providing links  
 
 Current support for 2 sites: 
-1.kingofshojo.com
+1.https://kingofshojo.com/
+
 2.https://aquareader.net/
 
 ## Prerequisites
@@ -98,7 +99,7 @@ Use a wired connection for faster npm package downloads.
 
 Keep Node.js and npm updated for best performance.
 
-Consider using npm ci for clean installs on fresh clones.
+Could you consider using npm ci for clean installs on fresh clones?
 
 Contributing
 Contributions, issues, and feature requests are welcome! Feel free to:
@@ -121,6 +122,7 @@ For questions or suggestions, contact:
 
 Shree Kamalesh
 GitHub: https://github.com/SHREE167
-Email: shree.kamalesh@example.com
+Email: shreekamalesh167@gmail.com
+Telegram: https://t.me/+hBGLgY7ZUZU2NTA9
 
 
