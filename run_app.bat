@@ -9,7 +9,7 @@ if not exist "node_modules" (
 )
 
 echo Starting backend server...
-start "" cmd /c "node backend/server.js"
+start "" cmd /k "cd /d "%~dp0backend" && node server.js"
 
 echo Starting the Electron app...
 call "node_modules\.bin\electron.cmd" .
