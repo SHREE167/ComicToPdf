@@ -1,0 +1,73 @@
+{
+  "name": "comic-scraper",
+   "description": "It helps to convert online comics into PDF format.",
+  "keywords": [
+    "comic",
+    "scraper",
+    "pdf",
+    "electron",
+    "react"
+  ],
+  "author": "Shree Kamalesh <shreekamalesh167@gamil.com>",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "autoprefixer": "^10.4.16",
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "framer-motion": "^12.4.2",
+    "gsap": "^3.13.0",
+    "jspdf": "^2.5.1",
+    "lucide-react": "^0.294.0",
+    "open": "^10.1.2",
+    "postcss": "^8.4.31",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "tailwindcss": "^3.3.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "electron": "^36.3.1",
+    "electron-builder": "^26.0.12",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  },
+  
+  "build": {
+    "appId": "com.shreekamalesh.comicscraper",
+    "productName": "ComicScraper",
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
