@@ -1,128 +1,152 @@
-# Comic To Pdf
 
-📖 A simple desktop app to scrape comics and view them offline.
- A powerful Electron desktop app combined with a Node.js backend server for scraping and processing data efficiently.
 
----
+# 📖 Comic To PDF
 
-## Table of Contents
-
-- [About](#about)  
-- [Features](#features)  
-- [Prerequisites](#prerequisites)  
-- [Installation](#installation)  
-- [Usage](#usage)  
-- [How It Works](#how-it-works)  
-- [Troubleshooting](#troubleshooting)  
-- [Performance Tips](#performance-tips)  
-- [Contributing](#contributing)  
-- [License](#license)
+A simple and powerful desktop app to scrape comics and view them offline. Built with Electron and Node.js to provide a fast, smooth, and intuitive experience.
 
 ---
 
-## About
+## 📚 Table of Contents
 
-Comic To Pdf effectively allows you to turn your favorite comics into pdfs for offline use!
-
----
-
-## Features
-
-- Automated installation of all required dependencies for both frontend and backend.  
-- Simultaneous startup of backend server and Electron app with a single script.  
-- Clear console logs guiding users through installation and launch processes.  
-- Easy-to-use and extensible project structure. 
-- Click your fav Comic just by providing links  
-
-Current support for 2 sites: 
-1.https://kingofshojo.com/
-
-2.https://aquareader.net/
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/en/download/) (v16 or later recommended)  
-- npm (comes bundled with Node.js)  
-- Windows OS (due to batch script usage)  
-- Optional: Git (for fetching git dependencies)
+* [About](#about)
+* [Features](#features)
+* [Prerequisites](#prerequisites)
+* [Installation](#installation)
+* [Usage](#usage)
+* [How It Works](#how-it-works)
+* [Troubleshooting](#troubleshooting)
+* [Performance Tips](#performance-tips)
+* [Contributing](#contributing)
+* [License](#license)
+* [Contact](#contact)
 
 ---
 
-## Installation
+## 📌 About
 
-1st method:
--Click and install the zip file!
--Unzip and click the run-app.bat file, this will install all the dependency for the application then you can see the UI in your browser! Happy Reading
+**Comic To PDF** is a desktop app that allows you to turn your favorite comics into downloadable PDFs for offline reading. Whether you're a fan of romance, action, or fantasy comics, this tool brings your favorite content right to your screen—offline and ready to read.
 
-2nd Method:
- **Clone the repository**
+---
 
-   ```bash
-   git clone https://github.com/SHREE167/Comic2Pdf
-   cd [to your directory]
+## 🚀 Features
+
+* ✅ One-click dependency installation for both frontend and backend.
+* ✅ Simultaneous launch of backend server and Electron app via `run-app.bat`.
+* ✅ Simple, easy-to-use interface.
+* ✅ Clear console logs for guidance and debugging.
+* ✅ Extensible project structure for future improvements.
+* ✅ Supports scraping from:
+
+  * 🌐 [https://kingofshojo.com](https://kingofshojo.com)
+  * 🌐 [https://aquareader.net](https://aquareader.net)
+
+---
+
+## ⚙️ Prerequisites
+
+* [Node.js](https://nodejs.org/) (v16 or higher recommended)
+* npm (comes with Node.js)
+* Windows OS (Batch script is Windows-specific)
+* *(Optional)* Git (for cloning repositories with Git dependencies)
+
+---
+
+## 🛠 Installation
+
+### 📦 Method 1: Pre-Built Zip
+
+1. **Download** the `.zip` file from the releases section.
+2. **Unzip** the contents to a convenient location.
+3. **Double-click** the `run-app.bat` file.
+4. The app will install dependencies and launch automatically.
+5. Start reading!
+
+### 💻 Method 2: Clone the Repo
+
+```bash
+git clone https://github.com/SHREE167/Comic2Pdf
+cd Comic2Pdf
 ```
-Then unzip and click the run-app.bat file, this will install all the dependency for the application then you can see the UI in your browser! Happy Reading!
 
-How It Works
-Depe
-ndency management: Checks if the node_modules directories exist before running npm install. This prevents redundant installs on subsequent runs.
+Then unzip (if cloned as ZIP), and double-click `run-app.bat`. This will install all dependencies and launch the UI.
 
-Backend server: Runs server.js located in the backend directory, serving API endpoints for data processing.
+---
 
-Electron app: Uses the locally installed Electron binary to launch the desktop UI.
+## 🧠 How It Works
 
-Troubleshooting
-App stuck during startup or dependency install:
+* **Dependency Management**: Checks if `node_modules` exist before installing to save time on future launches.
+* **Backend**: Launches `backend/server.js`, which handles scraping and data processing.
+* **Frontend**: Uses Electron to render the UI using local packages.
 
-Ensure stable internet connection during the first run.
+---
 
-Run the batch script as Administrator to avoid permission issues.
+## ❗ Troubleshooting
 
-Avoid spaces or special characters in the project path.
+**App stuck or not launching? Try the following:**
 
-Manually run npm install in the root and backend folders to verify installations.
+* Ensure your internet is stable during first-time setup.
+* Run `run-app.bat` as Administrator.
+* Avoid spaces/special characters in project path.
+* Run `npm install` manually in both `root/` and `backend/` folders if needed.
 
-'Electron' or other commands not recognized:
+**'Electron' or other commands not recognized?**
 
-Check if dependencies installed successfully in node_modules/.bin.
+* Check for `node_modules/.bin/electron.cmd`.
+* Delete `node_modules` and try `run-app.bat` again.
 
-Delete node_modules and run the batch script again.
+**Path errors on Windows?**
 
-Windows path errors (due to spaces in folder names):
-The batch script tries to handle paths with spaces by quoting them.
-If errors persist, consider moving the project folder to a path without spaces (e.g., C:\RealScraper).
+* Move your project folder to a simpler path like `C:\Comic2Pdf` to avoid Windows CMD path issues.
 
-Performance Tips
-Dependency installation speed depends mostly on your network and disk speed.
+---
 
-Use a wired connection for faster npm package downloads.
+## ⚡ Performance Tips
 
-Keep Node.js and npm updated for best performance.
+* Use a **wired internet connection** for faster npm installs.
+* Keep **Node.js and npm updated** for best compatibility.
+* For fresh clones, consider using `npm ci` instead of `npm install` for cleaner installs.
 
-Could you consider using npm ci for clean installs on fresh clones?
+---
 
-Contributing
-Contributions, issues, and feature requests are welcome! Feel free to:
+## 🤝 Contributing
 
-Fork the repo
+We welcome contributions of any kind! Here's how:
 
-Create a branch for your feature (git checkout -b feature-name)
+1. Fork the repository.
+2. Create a new branch:
 
-Commit your changes (git commit -m 'Add some feature')
+```bash
+git checkout -b feature-name
+```
 
-Push to the branch (git push origin feature-name)
+3. Commit your changes:
 
-Open a Pull Request
+```bash
+git commit -m "Add feature XYZ"
+```
 
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
+4. Push the branch:
 
-Contact
-For questions or suggestions, contact:
+```bash
+git push origin feature-name
+```
 
-Shree Kamalesh
-GitHub: https://github.com/SHREE167
-Email: shreekamalesh167@gmail.com
-Telegram: https://t.me/+hBGLgY7ZUZU2NTA9
+5. Open a Pull Request!
 
+---
 
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 📬 Contact
+
+Feel free to reach out for feedback, ideas, or collaboration:
+
+* **GitHub**: [SHREE167](https://github.com/SHREE167)
+* **Email**: [shreekamalesh167@gmail.com](mailto:shreekamalesh167@gmail.com)
+* **Telegram**: [Join here](https://t.me/+hBGLgY7ZUZU2NTA9)
+
+---
