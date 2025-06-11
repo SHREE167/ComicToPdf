@@ -192,4 +192,67 @@ app.post("/scrape-comic", async (req, res) => {
 // You would deploy this on a Node.js hosting platform like Vercel or Netlify
 // (if it stays within their function limits) or a more traditional Node.js host.
 // The key change is removing Puppeteer.
+app.post("/search-manga", async (req, res) => {
+    const { mangaName, site } = req.body;
+
+    if (!mangaName || !site) {
+        return res.status(400).json({ error: "Manga name and site are required!" });
+    }
+
+    if (site !== "kingofshojo") {
+        return res.status(400).json({ error: "Currently, only 'kingofshojo' is supported for search." });
+    }
+
+    try {
+        const encodedMangaName = encodeURIComponent(mangaName);
+        const searchUrl = `https://kingofshojo.com/?s=${encodedMangaName}`;
+
+        console.log(`🔍 Searching for "${mangaName}" on ${site} at ${searchUrl}`);
+
+        const response = await axios.get(searchUrl);
+        const html = response.data;
+        const $ = cheerio.load(html);
+
+        const results = [];
+        // Based on exploration, search results are in `<a>` tags.
+        // For kingofshojo, a relevant selector might be `div.bsx > a` or similar,
+        // containing the title and URL.
+        $('div.bsx > a').each((i, el) => { // This selector is based on the subtask description.
+            const title = $(el).attr('title'); // Or $(el).text().trim();
+            const url = $(el).attr('href');
+            if (title && url) {
+                results.push({ title, url });
+            }
+        });
+
+        if (results.length === 0) {
+            console.log(`⚠️ No results found for "${mangaName}" on ${site}. This could be due to no actual results or a change in website structure.`);
+        } else {
+            console.log(`✅ Found ${results.length} results for "${mangaName}" on ${site}`);
+        }
+
+        return res.json(results); // Return empty array if no results, or the populated array.
+
+    } catch (error) {
+        console.error(`🚨 Error searching for manga "${mangaName}" on ${site}:`, error.message);
+        // Log more detailed error information
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error("Error Response Data:", error.response.data);
+            console.error("Error Response Status:", error.response.status);
+            console.error("Error Response Headers:", error.response.headers);
+            return res.status(error.response.status).json({ error: `Failed to fetch from ${site}. Site responded with ${error.response.status}` });
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error("Error Request:", error.request);
+            return res.status(500).json({ error: `No response received from ${site} when searching for manga.` });
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Error Message:', error.message);
+            return res.status(500).json({ error: `Failed to search manga on ${site}. An internal error occurred.` });
+        }
+    }
+});
+
 app.listen(5000, () => console.log("✅ Server running on port 5000"));
