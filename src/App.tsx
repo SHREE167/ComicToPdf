@@ -81,12 +81,6 @@ function App() {
       setIsSearching(false);
     }
   };
-      if (error instanceof Error) {
-          return error.message;
-      }
-      // You could add more checks here if you expect other error shapes
-      return 'An unknown error occurred.';
-  };
 
 
   // Fetch chapters based on URL
