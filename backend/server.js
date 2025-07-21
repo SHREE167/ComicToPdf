@@ -255,4 +255,46 @@ app.post("/search-manga", async (req, res) => {
     }
 });
 
+app.post("/get-chapter-images", async (req, res) => {
+    const { chapterUrl } = req.body;
+
+    if (!chapterUrl) {
+        return res.status(400).json({ error: "Chapter URL is required!" });
+    }
+
+    let siteType;
+    if (chapterUrl.includes("aquareader.net/manga/")) {
+        siteType = "aquareader";
+    } else if (chapterUrl.includes("kingofshojo.com/manga/")) {
+        siteType = "kingofshojo";
+    } else {
+        return res.status(400).json({ error: "Invalid chapter URL!" });
+    }
+
+    try {
+        console.log(`📖 Scraping images from: ${chapterUrl}`);
+        const responseChapterPage = await axios.get(chapterUrl);
+        const htmlChapterPage = responseChapterPage.data;
+        const $chapter = cheerio.load(htmlChapterPage);
+        let imageUrls = [];
+
+        if (siteType === "aquareader") {
+            imageUrls = $chapter("img.wp-manga-chapter-img")
+                .map((i, el) => $chapter(el).attr("data-src") || $chapter(el).attr("src"))
+                .get();
+        } else if (siteType === "kingofshojo") {
+            imageUrls = $chapter("img[src]")
+                .map((i, el) => $chapter(el).attr("src"))
+                .get()
+                .filter(url => url.includes("kingofshojo.com/wp-content/uploads/manga/"));
+        }
+
+        console.log(`✅ Found ${imageUrls.length} images for ${chapterUrl}`);
+        return res.json({ imageUrls });
+    } catch (error) {
+        console.error(`🚨 Error scraping chapter images:`, error);
+        res.status(500).json({ error: "Failed to scrape chapter images." });
+    }
+});
+
 app.listen(5000, () => console.log("✅ Server running on port 5000"));
