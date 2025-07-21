@@ -3,10 +3,11 @@ import { Loader, X } from "lucide-react";
 
 interface ComicReaderProps {
   chapterUrl: string;
+  siteType: string | null;
   onClose: () => void;
 }
 
-const ComicReader: React.FC<ComicReaderProps> = ({ chapterUrl, onClose }) => {
+const ComicReader: React.FC<ComicReaderProps> = ({ chapterUrl, siteType, onClose }) => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +20,7 @@ const ComicReader: React.FC<ComicReaderProps> = ({ chapterUrl, onClose }) => {
         const response = await fetch("http://localhost:5000/get-chapter-images", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chapterUrl }),
+          body: JSON.stringify({ chapterUrl, siteType }),
         });
 
         if (!response.ok) {
@@ -44,7 +45,7 @@ const ComicReader: React.FC<ComicReaderProps> = ({ chapterUrl, onClose }) => {
     if (chapterUrl) {
       fetchChapterImages();
     }
-  }, [chapterUrl]);
+  }, [chapterUrl, siteType]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
