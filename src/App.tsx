@@ -22,6 +22,7 @@ function App() {
   const [selectedEnd, setSelectedEnd] = useState("");
   const [loading, setLoading] = useState(false); // Used for chapter fetching & PDF generation
   const [status, setStatus] = useState<{ type: string, message: string }>({ type: "", message: "" });
+  const [siteType, setSiteType] = useState<string | null>(null);
   const [readingChapterUrl, setReadingChapterUrl] = useState<string | null>(null);
 
   // New state variables for manga search
@@ -121,7 +122,7 @@ function App() {
       setChapters(data.chapters as Chapter[]); // Cast if necessary based on how precise you checked above
       setSelectedStart(data.chapters[0]?.title || "");
       setSelectedEnd(data.chapters[data.chapters.length - 1]?.title || "");
-      setSiteType(data.siteType || null); // Ensure siteType is string or null
+      setSiteType(data.siteType || null);
       setStatus({ type: "success", message: "Chapters loaded successfully!" });
     } catch (err: unknown) { // <-- Type the catch variable as unknown
       setStatus({ type: "error", message: getErrorMessage(err) || "Failed to fetch chapters" }); // <-- Use the helper function
@@ -179,7 +180,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-6 space-y-6">
       {readingChapterUrl && (
-        <ComicReader chapterUrl={readingChapterUrl} onClose={handleCloseReader} />
+        <ComicReader chapterUrl={readingChapterUrl} siteType={siteType} onClose={handleCloseReader} />
       )}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

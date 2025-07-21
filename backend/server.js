@@ -256,19 +256,10 @@ app.post("/search-manga", async (req, res) => {
 });
 
 app.post("/get-chapter-images", async (req, res) => {
-    const { chapterUrl } = req.body;
+    const { chapterUrl, siteType } = req.body;
 
-    if (!chapterUrl) {
-        return res.status(400).json({ error: "Chapter URL is required!" });
-    }
-
-    let siteType;
-    if (chapterUrl.includes("aquareader.net/manga/")) {
-        siteType = "aquareader";
-    } else if (chapterUrl.includes("kingofshojo.com/manga/")) {
-        siteType = "kingofshojo";
-    } else {
-        return res.status(400).json({ error: "Invalid chapter URL!" });
+    if (!chapterUrl || !siteType) {
+        return res.status(400).json({ error: "Chapter URL and siteType are required!" });
     }
 
     try {
