@@ -1,11 +1,12 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { motion } from "framer-motion";
-import { Download, Loader, List, Search } from "lucide-react"; // Added Search icon
+import { Download, Loader, List, Search, BookOpen } from "lucide-react";
+import ComicReader from "./ComicReader";
 
 // Define an interface for your chapter data structure
 interface Chapter {
   title: string;
-  // url: string; // Example: if you also store URLs directly with chapters
+  url: string;
 }
 
 // Define an interface for search results
@@ -21,7 +22,7 @@ function App() {
   const [selectedEnd, setSelectedEnd] = useState("");
   const [loading, setLoading] = useState(false); // Used for chapter fetching & PDF generation
   const [status, setStatus] = useState<{ type: string, message: string }>({ type: "", message: "" });
-  const [siteType, setSiteType] = useState<string | null>(null);
+  const [readingChapterUrl, setReadingChapterUrl] = useState<string | null>(null);
 
   // New state variables for manga search
   const [mangaName, setMangaName] = useState("");
@@ -167,8 +168,19 @@ function App() {
     }
   };
 
+  const handleReadOnline = (chapterUrl: string) => {
+    setReadingChapterUrl(chapterUrl);
+  };
+
+  const handleCloseReader = () => {
+    setReadingChapterUrl(null);
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-6 space-y-6">
+      {readingChapterUrl && (
+        <ComicReader chapterUrl={readingChapterUrl} onClose={handleCloseReader} />
+      )}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -286,30 +298,46 @@ function App() {
           </button>
 
           {chapters.length > 0 && (
-            <div className="grid grid-cols-2 gap-4">
-              <select
-                value={selectedStart}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedStart(e.target.value)}
-                className="block w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-400"
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <select
+                  value={selectedStart}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedStart(e.target.value)}
+                  className="block w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-400"
+                >
+                  {chapters.map((chapter) => (
+                    <option key={chapter.title} value={chapter.title}>{chapter.title}</option>
+                  ))}
+                </select>
+                <select
+                  value={selectedEnd}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedEnd(e.target.value)}
+                  className="block w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-400"
+                >
+                  {chapters.map((chapter) => (
+                    <option key={chapter.title} value={chapter.title}>{chapter.title}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const chapter = chapters.find(c => c.title === selectedStart);
+                  if (chapter) {
+                    handleReadOnline(chapter.url);
+                  }
+                }}
+                disabled={loading || chapters.length === 0}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
               >
-                {chapters.map((chapter) => (
-                  <option key={chapter.title} value={chapter.title}>{chapter.title}</option>
-                ))}
-              </select>
-              <select
-                value={selectedEnd}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedEnd(e.target.value)}
-                className="block w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-400"
-              >
-                {chapters.map((chapter) => (
-                  <option key={chapter.title} value={chapter.title}>{chapter.title}</option>
-                ))}
-              </select>
+                <BookOpen className="h-5 w-5" />
+                Read Chapter Online
+              </button>
             </div>
           )}
 
           <button
-            type="submit" // Keep type="submit" as the form has an onSubmit handler
+            type="submit"
             disabled={loading || chapters.length === 0}
             className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
