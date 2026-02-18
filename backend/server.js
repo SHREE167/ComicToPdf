@@ -174,9 +174,12 @@ app.post("/scrape-comic", async (req, res) => {
                         console.log(`📥 Downloading: ${imageUrl}`);
                         try {
                             const imageResponse = await axios.get(imageUrl, { responseType: "arraybuffer" });
-                            const imageBuffer = await sharp(imageResponse.data).toFormat("png").toBuffer();
+                            const imageBuffer = await sharp(imageResponse.data)
+                                .trim({ threshold: 10 }) // Auto-trim white header/footer
+                                .toFormat("png")
+                                .toBuffer();
                             const img = doc.openImage(imageBuffer);
-                            doc.addPage({ size: [img.width, img.height] });
+                            doc.addPage({ size: [img.width, img.height], margin: 0 });
                             doc.image(img, 0, 0, { width: img.width, height: img.height });
                         } catch (imgError) {
                             console.error(`🚨 Error processing image ${imageUrl}:`, imgError);

@@ -127,7 +127,7 @@ const ComicReader: React.FC<ComicReaderProps> = ({ chapterUrl, siteType, onClose
                 />
               </div>
             ) : (
-              <div className="flex flex-col items-center space-y-2">
+              <div className="flex flex-col items-center space-y-0">
                 {imageUrls.map((url, index) => (
                   <img key={index} src={url} alt={`Page ${index + 1}`} className="max-w-full h-auto" />
                 ))}
