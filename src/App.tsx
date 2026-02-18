@@ -13,7 +13,6 @@ function App() {
   const [selectedEnd, setSelectedEnd] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ type: string, message: string }>({ type: "", message: "" });
-  const [siteType, setSiteType] = useState<string | null>(null);
   const [readingChapterUrl, setReadingChapterUrl] = useState<string | null>(null);
 
   const getErrorMessage = (error: unknown): string => {
@@ -51,7 +50,6 @@ function App() {
       setChapters(data.chapters as Chapter[]);
       setSelectedStart(data.chapters[0]?.title || "");
       setSelectedEnd(data.chapters[data.chapters.length - 1]?.title || "");
-      setSiteType(data.siteType || null);
       setStatus({ type: "success", message: "Chapters loaded successfully!" });
     } catch (err: unknown) {
       setStatus({ type: "error", message: getErrorMessage(err) || "Failed to fetch chapters" });
@@ -100,7 +98,7 @@ function App() {
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-800 via-cyber-black to-cyber-black"></div>
 
       {readingChapterUrl && (
-        <ComicReader chapterUrl={readingChapterUrl} siteType={siteType} onClose={() => setReadingChapterUrl(null)} />
+        <ComicReader chapterUrl={readingChapterUrl} onClose={() => setReadingChapterUrl(null)} />
       )}
       <motion.div
         initial={{ opacity: 0, y: -20, scale: 0.95 }}
