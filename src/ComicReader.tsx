@@ -82,54 +82,61 @@ const ComicReader: React.FC<ComicReaderProps> = ({ chapterUrl, siteType, onClose
   };
 
   return (
-    <div ref={readerRef} className={`fixed inset-0 bg-gray-900 flex justify-center items-center z-50 ${isFullScreen ? 'p-0' : 'p-4'}`}>
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full h-full flex flex-col">
-        <div className="flex justify-between items-center p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold text-white">Reading Chapter</h2>
+    <div ref={readerRef} className={`fixed inset-0 bg-cyber-black flex justify-center items-center z-50 ${isFullScreen ? 'p-0' : 'p-4'}`}>
+      <div className="bg-cyber-gray rounded-lg shadow-neon-blue border border-neon-blue/30 w-full h-full flex flex-col overflow-hidden relative">
+        <div className="flex justify-between items-center p-4 border-b border-neon-blue/20 bg-cyber-black/50 backdrop-blur-sm z-10">
+          <h2 className="text-xl font-bold text-neon-blue font-orbitron tracking-wider">SECURE READER LINK</h2>
           <div className="flex items-center space-x-4">
-            <button onClick={() => setZoomLevel(z => z + 0.1)} className="text-gray-400 hover:text-white" disabled={viewMode === 'scroll'}>
-              <ZoomIn size={24} />
-            </button>
-            <button onClick={() => setZoomLevel(z => Math.max(0.1, z - 0.1))} className="text-gray-400 hover:text-white" disabled={viewMode === 'scroll'}>
-              <ZoomOut size={24} />
-            </button>
-            <button onClick={() => setViewMode(m => m === 'single' ? 'scroll' : 'single')} className="text-gray-400 hover:text-white">
-              <View size={24} />
-            </button>
-            <button onClick={toggleFullScreen} className="text-gray-400 hover:text-white">
+            <div className="p-1 bg-cyber-dark rounded border border-gray-700 flex space-x-1">
+              <button onClick={() => setZoomLevel(z => z + 0.1)} className="p-1 text-neon-silver hover:text-neon-blue transition-colors" disabled={viewMode === 'scroll'} title="Zoom In">
+                <ZoomIn size={20} />
+              </button>
+              <button onClick={() => setZoomLevel(z => Math.max(0.1, z - 0.1))} className="p-1 text-neon-silver hover:text-neon-blue transition-colors" disabled={viewMode === 'scroll'} title="Zoom Out">
+                <ZoomOut size={20} />
+              </button>
+              <div className="w-px bg-gray-700"></div>
+              <button onClick={() => setViewMode(m => m === 'single' ? 'scroll' : 'single')} className={`p-1 transition-colors ${viewMode === 'scroll' ? 'text-neon-blue' : 'text-neon-silver hover:text-white'}`} title="Toggle View Mode">
+                <View size={20} />
+              </button>
+            </div>
+            <button onClick={toggleFullScreen} className="text-neon-silver hover:text-neon-blue transition-colors">
               {isFullScreen ? <Minimize size={24} /> : <Maximize size={24} />}
             </button>
-            <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <button onClick={onClose} className="text-red-500 hover:text-red-400 transition-colors">
               <X size={24} />
             </button>
           </div>
         </div>
 
-        <div className="flex-grow overflow-auto p-4 relative">
+        <div className="flex-grow overflow-auto p-0 relative bg-cyber-black">
           {loading && (
-            <div className="flex justify-center items-center h-full">
-              <Loader className="animate-spin h-12 w-12 text-blue-400" />
+            <div className="flex flex-col justify-center items-center h-full space-y-4">
+              <Loader className="animate-spin h-16 w-16 text-neon-blue" />
+              <p className="font-mono text-neon-blue animate-pulse">DECRYPTING IMAGE DATA...</p>
             </div>
           )}
           {error && (
             <div className="flex justify-center items-center h-full">
-              <p className="text-red-400">{error}</p>
+              <div className="border border-red-500 bg-red-900/20 p-6 rounded-lg text-center">
+                <p className="text-red-500 font-bold font-orbitron text-xl mb-2">ERROR DETECTED</p>
+                <p className="text-red-300 font-mono">{error}</p>
+              </div>
             </div>
           )}
           {!loading && !error && imageUrls.length > 0 && (
             viewMode === 'single' ? (
-              <div className="flex flex-col items-center justify-center h-full">
+              <div className="flex flex-col items-center justify-center h-full min-h-screen">
                 <img
                   src={imageUrls[currentPage]}
                   alt={`Page ${currentPage + 1}`}
-                  className="max-w-full max-h-full object-contain"
+                  className="max-w-full max-h-full object-contain shadow-2xl"
                   style={{ transform: `scale(${zoomLevel})` }}
                 />
               </div>
             ) : (
-              <div className="flex flex-col items-center space-y-0">
+              <div className="flex flex-col items-center space-y-0 w-full">
                 {imageUrls.map((url, index) => (
-                  <img key={index} src={url} alt={`Page ${index + 1}`} className="max-w-full h-auto" />
+                  <img key={index} src={url} alt={`Page ${index + 1}`} className="max-w-full h-auto shadow-lg" />
                 ))}
               </div>
             )
@@ -137,21 +144,21 @@ const ComicReader: React.FC<ComicReaderProps> = ({ chapterUrl, siteType, onClose
         </div>
 
         {viewMode === 'single' && (
-          <div className="flex justify-between items-center p-4 border-t border-gray-700">
+          <div className="flex justify-between items-center p-4 border-t border-neon-blue/20 bg-cyber-black/50 backdrop-blur-sm z-10">
             <button
               onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
               disabled={currentPage === 0}
-              className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+              className="p-2 rounded-full border border-neon-blue/50 text-neon-blue hover:bg-neon-blue hover:text-cyber-black disabled:opacity-30 disabled:border-gray-700 disabled:text-gray-500 transition-all"
             >
               <ArrowLeft size={24} />
             </button>
-            <div className="text-white">
-              {currentPage + 1} / {imageUrls.length}
+            <div className="text-neon-silver font-mono">
+              <span className="text-neon-blue">PAGE</span> {currentPage + 1} <span className="text-gray-600">/</span> {imageUrls.length}
             </div>
             <button
               onClick={() => setCurrentPage(p => Math.min(imageUrls.length - 1, p + 1))}
               disabled={currentPage === imageUrls.length - 1}
-              className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+              className="p-2 rounded-full border border-neon-blue/50 text-neon-blue hover:bg-neon-blue hover:text-cyber-black disabled:opacity-30 disabled:border-gray-700 disabled:text-gray-500 transition-all"
             >
               <ArrowRight size={24} />
             </button>
