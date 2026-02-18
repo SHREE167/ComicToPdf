@@ -39,6 +39,20 @@ class KingOfShojoScraper extends BaseScraper {
             .get()
             .filter(url => url && url.includes("kingofshojo.com/wp-content/uploads/manga/"));
     }
+
+    async search(query) {
+        const encodedQuery = encodeURIComponent(query);
+        const searchUrl = `${this.baseUrl}/?s=${encodedQuery}`;
+        const $ = await this.fetchHtml(searchUrl);
+
+        return $('div.bsx > a')
+            .map((i, el) => ({
+                title: $(el).attr('title'),
+                url: $(el).attr('href')
+            }))
+            .get()
+            .filter(item => item.title && item.url);
+    }
 }
 
 module.exports = KingOfShojoScraper;

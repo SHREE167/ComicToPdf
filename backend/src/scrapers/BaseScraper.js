@@ -28,6 +28,10 @@ class BaseScraper {
         throw new Error("Method 'getChapterImages' must be implemented.");
     }
 
+    async search(query) {
+        throw new Error("Method 'search' must be implemented.");
+    }
+
     extractChapterNumber(title) {
         const match = title.match(/(\d+(\.\d+)?)/);
         return match ? parseFloat(match[0]) : 0;
