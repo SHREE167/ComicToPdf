@@ -17,6 +17,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSelectUrl, onError }) => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchAttempted, setSearchAttempted] = useState(false);
+  const [selectedSite, setSelectedSite] = useState("kingofshojo");
 
   const handleSearchManga = async () => {
     if (mangaName.trim() === "") return;
@@ -29,7 +30,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSelectUrl, onError }) => {
       const response = await fetch("http://localhost:5000/search-manga", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mangaName, site: "kingofshojo" }),
+        body: JSON.stringify({ mangaName, site: selectedSite }),
       });
 
       if (!response.ok) {
@@ -60,6 +61,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSelectUrl, onError }) => {
           SEARCH DATABASE
         </label>
         <div className="flex gap-2 relative">
+          <select
+            value={selectedSite}
+            onChange={(e) => setSelectedSite(e.target.value)}
+            className="bg-cyber-dark text-neon-silver border border-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-neon-blue focus:border-neon-blue font-orbitron text-sm font-bold outline-none cursor-pointer hover:bg-gray-800 transition-colors"
+          >
+            <option value="kingofshojo">KING OF SHOJO</option>
+            <option value="aquareader">AQUA READER</option>
+          </select>
           <input
             type="text"
             id="manga-name-search"
@@ -69,10 +78,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSelectUrl, onError }) => {
               setSearchAttempted(false);
               setSearchResults([]);
             }}
-            placeholder="Search KingOfShojo..."
+            placeholder={`Search ${selectedSite === 'kingofshojo' ? 'KingOfShojo' : 'AquaReader'}...`}
             className="block w-full px-4 py-3 pl-10 bg-cyber-dark text-neon-silver border border-gray-700 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue focus:shadow-neon-blue transition-all duration-300 placeholder-gray-600 font-mono"
           />
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 left-[160px] pl-3 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-500" />
           </div>
 
@@ -114,7 +123,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSelectUrl, onError }) => {
             exit={{ opacity: 0, height: 0 }}
             className="text-center text-red-400 font-mono text-sm bg-red-900/20 border border-red-900/50 p-3 rounded-lg"
           >
-            NO DATA FOUND FOR "{mangaName}".
+            NO DATA FOUND FOR "{mangaName}" ON {selectedSite.toUpperCase()}.
           </motion.div>
         )}
       </AnimatePresence>

@@ -148,28 +148,11 @@ class MangaController {
             return res.status(400).json({ error: "Manga name and site are required!" });
         }
 
-        if (site !== "kingofshojo") {
-            return res.status(400).json({ error: "Currently, only 'kingofshojo' is supported for search." });
-        }
-
         try {
-            const encodedMangaName = encodeURIComponent(mangaName);
-            const searchUrl = `https://kingofshojo.com/?s=${encodedMangaName}`;
-
-            console.log(`🔍 Searching for "${mangaName}" on ${site} at ${searchUrl}`);
-
-            const response = await axios.get(searchUrl);
-            const html = response.data;
-            const $ = cheerio.load(html);
-
-            const results = [];
-            $('div.bsx > a').each((i, el) => {
-                const title = $(el).attr('title');
-                const url = $(el).attr('href');
-                if (title && url) {
-                    results.push({ title, url });
-                }
-            });
+            console.log(`🔍 Searching for "${mangaName}" on ${site}`);
+            
+            const scraper = ScraperService.getScraperByName(site);
+            const results = await scraper.search(mangaName);
 
             if (results.length === 0) {
                 console.log(`⚠️ No results found for "${mangaName}" on ${site}.`);
@@ -181,11 +164,7 @@ class MangaController {
 
         } catch (error) {
             console.error(`🚨 Error searching for manga "${mangaName}" on ${site}:`, error.message);
-            if (error.response) {
-                return res.status(error.response.status).json({ error: `Failed to fetch from ${site}. Status: ${error.response.status}` });
-            } else {
-                 return res.status(500).json({ error: `Failed to search manga on ${site}. Internal server error.` });
-            }
+            res.status(500).json({ error: `Failed to search manga on ${site}: ${error.message}` });
         }
     }
 }

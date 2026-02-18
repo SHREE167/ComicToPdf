@@ -17,6 +17,17 @@ class ScraperService {
         if (url.includes("aquareader.net")) return "aquareader";
         return null;
     }
+
+    static getScraperByName(name) {
+        const normalized = name.toLowerCase();
+        if (normalized === "kingofshojo") {
+            return new KingOfShojoScraper();
+        } else if (normalized === "aquareader") {
+            return new AquaReaderScraper();
+        } else {
+            throw new Error(`Unsupported site name: ${name}`);
+        }
+    }
 }
 
 module.exports = ScraperService;
